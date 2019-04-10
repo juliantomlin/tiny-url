@@ -12,10 +12,11 @@
   <% include ./partial/_header %>
 
     <% for (url in urls) {%>
-    <p1> <%= urls[url] + " Shortened URL is /u/" + url %> <br> </p1>
+    <h3> <%= 'u/' + url %> </h3>
+    <p1> <%= urls[url] %> </p1>
+    <a href="/urls/<%= url %>">edit</a> <br>
     <form class="button" method="POST" action="/urls/<%= url %>/delete">
       <button type="submit" class="btn btn-primary">Delete</button>
-      <!-- <input type="button" value="delete" onclick="submit" > -->
     </form>
     <% }%>
 </body>
