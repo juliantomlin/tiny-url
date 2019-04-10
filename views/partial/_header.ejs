@@ -1,3 +1,21 @@
 <h> URL Shortener </h>
+  <% if (login) { %>
+    <h5> <%= login %> </h4>
+    <form class="button" method="POST" action="/logout">
+      <button type="submit" class="btn btn-primary">logout</button>
+    </form>
+  <% } else { %>
+
+      <form class="form-inline" action="/" method="POST">
+
+          <div class="form-group mb-2">
+
+            <input class="form-control" type="text" name="username" placeholder="username" style="width: 200px; margin: 1em">
+
+            <button type="submit" class="btn btn-primary">Login</button>
+
+          </div>
+        </form>
+    <% } %>
 <br>
 <br>
