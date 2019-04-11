@@ -11,6 +11,8 @@
 <body style="font-size:20px; padding:50px;">
   <% include ./partial/_header %>
 
+  <h3> <a href="/urls/">Back</a>
+
     <h1> <%= longURL + " ===> " + shortURL %> </h1>
     <form class="form-inline" action="/urls/<%= shortURL %>" method="POST">
 
