@@ -101,9 +101,16 @@ app.get("/urls/:shortURL", (req, res) => {
   let templateVars = {shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL};
   if (req.cookies.user_id){
     templateVars.login = users[req.cookies.user_id].email
+    if (req.cookies.user_id === urlDatabase[req.params.shortURL].userID){
+      templateVars.owner = 'yes'
+    }
+    else{
+      templateVars.owner = 'no'
+    }
   }
   else {
     templateVars.login = ''
+    templateVars.owner = 'no'
   }
   res.render("urls_show", templateVars)
 })
