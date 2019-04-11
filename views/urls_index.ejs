@@ -11,6 +11,8 @@
 <body style="font-size:20px; padding:50px;">
   <% include ./partial/_header %>
 
+  <h4> <a href="/urls/new/">Shorten a URL</a> </h4>
+<br>
     <% for (url in urls) {%>
     <h3> <%= 'u/' + url %> </h3>
     <p1> <%= urls[url] %> </p1>

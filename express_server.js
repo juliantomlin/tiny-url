@@ -44,6 +44,9 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
+  if (!users[req.cookies.user_id]){
+    res.redirect('/login/')
+  }
   let templateVars = {}
   if (req.cookies.user_id){
     templateVars.login = users[req.cookies.user_id].email
