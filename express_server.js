@@ -14,11 +14,6 @@ const urlDatabase = {
 };
 
 const users = {
-    default: {
-    id: "",
-    email: "",
-    password: ""
-  },
   "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
@@ -59,6 +54,17 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars)
 })
 
+app.get("/login/", (req, res) => {
+  let templateVars = {}
+  if (req.cookies.user_id){
+    templateVars.login = users[req.cookies.user_id].email
+  }
+  else {
+    templateVars.login = ''
+  }
+  res.render("login", templateVars)
+})
+
 app.get("/register/", (req, res) => {
   let templateVars = {}
   if (req.cookies.user_id){
@@ -92,8 +98,28 @@ app.post('/', (req, res) => {
 })
 
 app.post('/logout', (req, res) => {
-  res.cookie('username', '')
+  res.cookie('user_id', '')
   res.redirect('/urls/')
+})
+
+app.post('/login', (req, res) => {
+if (!req.body.email || !req.body.password){
+    res.sendStatus(400)
+  }
+  else{
+    for (user in users){
+      if (users[user].email === req.body.email) {
+        if (users[user].password === req.body.password) {
+          res.cookie('user_id', user)
+          res.redirect('/urls/')
+        }
+        else {
+          res.send('Incorrect password')
+        }
+      }
+    }
+    res.send('Non-existing Email')
+  }
 })
 
 app.post('/register', (req, res) => {
