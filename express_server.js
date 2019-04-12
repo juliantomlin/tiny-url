@@ -41,12 +41,17 @@ const users = {
 }
 
 app.get("/", (req, res) => {
-  res.send("Hello!")
+  if (users[req.session.user_id]){
+    res.redirect('/urls/')
+  }
+  else {
+    res.redirect('/login/')
+  }
 })
 
 app.get("/urls", (req, res) => {
   let templateVars = {}
-  if (req.session.user_id) {
+  if (users[req.session.user_id]) {
     templateVars.urls = getUserUrls(req.session.user_id, urlDatabase)
     templateVars.login = users[req.session.user_id].email
   }
@@ -58,45 +63,47 @@ app.get("/urls", (req, res) => {
 })
 
 app.get("/urls/new", (req, res) => {
-  if (!users[req.session.user_id]) {
+  if (users[req.session.user_id]) {
+    let templateVars = {}
+    if (req.session.user_id) {
+      templateVars.login = users[req.session.user_id].email
+    }
+    else {
+      templateVars.login = ''
+    }
+    res.render("urls_new", templateVars)
+  }
+  else{
     res.redirect('/login/')
   }
-  let templateVars = {}
-  if (req.session.user_id) {
-    templateVars.login = users[req.session.user_id].email
-  }
-  else {
-    templateVars.login = ''
-  }
-  res.render("urls_new", templateVars)
 })
 
 app.get("/login/", (req, res) => {
   let templateVars = {}
-  if (req.session.user_id) {
-    templateVars.login = users[req.session.user_id].email
+  if (users[req.session.user_id]) {
+    res.redirect('/urls/')
   }
   else {
     templateVars.login = ''
+    res.render("login", templateVars)
   }
-  res.render("login", templateVars)
 })
 
 app.get("/register/", (req, res) => {
   let templateVars = {}
-  if (req.session.user_id){
-    templateVars.login = users[req.session.user_id].email
+  if (users[req.session.user_id]){
+    res.redirect('/urls/')
   }
   else {
     templateVars.login = ''
+    res.render("register", templateVars)
   }
-  res.render("register", templateVars)
 })
 
 
 app.get("/urls/:shortURL", (req, res) => {
   if (urlDatabase[req.params.shortURL]) {
-    let templateVars = {shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL}
+    let templateVars = {shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, viewCount: urlDatabase[req.params.shortURL].viewCount}
     if (req.session.user_id) {
       templateVars.login = users[req.session.user_id].email
       if (req.session.user_id === urlDatabase[req.params.shortURL].userID) {
@@ -120,10 +127,15 @@ app.get("/urls/:shortURL", (req, res) => {
 app.get(`/u/:shortURL`, (req, res) => {
   if (urlDatabase[req.params.shortURL]) {
     res.redirect(urlDatabase[req.params.shortURL].longURL)
+    urlDatabase[req.params.shortURL].viewCount += 1
   }
   else {
     res.sendStatus(404)
   }
+})
+
+app.get('/password_recovery', (req, res) => {
+  res.send('Just make a new account then, LUL')
 })
 
 app.post('/', (req, res) => {
@@ -148,11 +160,11 @@ if (!req.body.email || !req.body.password) {
           res.redirect('/urls/')
         }
         else {
-          res.send('Incorrect password')
+          res.send('Incorrect e-mail or password')
         }
       }
     }
-    res.send('Non-existing Email')
+    res.send('Non-existant Email')
   }
 })
 
@@ -175,19 +187,35 @@ app.post('/register', (req, res) => {
 })
 
 app.post('/urls/:shortURL/delete', (req, res) => {
-  delete urlDatabase[req.params.shortURL]
-  res.redirect(/urls/)
+  if (req.session.user_id === urlDatabase[req.params.shortURL].userID) {
+    delete urlDatabase[req.params.shortURL]
+    res.redirect(/urls/)
+  }
+  else {
+    res.send('HEY! How did you do this!? Stop that!')
+  }
 })
 
 app.post('/urls/:shortURL', (req, res) => {
-  urlDatabase[req.params.shortURL].longURL = req.body.longURL
-  res.redirect(`/urls/${req.params.shortURL}`)
+  if (req.session.user_id === urlDatabase[req.params.shortURL].userID) {
+    urlDatabase[req.params.shortURL].longURL = req.body.longURL
+    res.redirect(`/urls/${req.params.shortURL}`)
+  }
+  else {
+    res.send('HEY! How did you do this!? Stop that!')
+  }
 })
 
 app.post("/urls", (req, res) => {
-  let random = generateRandomString()
-  urlDatabase[random] = { longURL: req.body.longURL, userID: req.session.user_id }
-  res.redirect(`/urls/${random}`)
+  if (req.session.user_id) {
+    let random = generateRandomString()
+    urlDatabase[random] = { longURL: req.body.longURL, userID: req.session.user_id }
+    urlDatabase[random].viewCount = 0
+    res.redirect(`/urls/${random}`)
+  }
+  else {
+    res.send('HEY! How did you do this!? Stop that!')
+  }
 })
 
 

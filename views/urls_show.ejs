@@ -14,6 +14,13 @@
   <h3> <a href="/urls/">Back</a>
 
     <h1> <%= longURL + " ===> " + shortURL %> </h1>
+    <% if (viewCount !== 1) { %>
+    <p>This link has been used <%= viewCount %> times <p>
+
+    <% } else { %>
+    <p>This link has been used <%= viewCount %> time <p>
+    <% } %>
+
     <% if (owner === 'yes') { %>
     <form class="form-inline" action="/urls/<%= shortURL %>" method="POST">
 
